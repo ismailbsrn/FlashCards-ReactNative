@@ -7,7 +7,6 @@ const _Layout = () => {
             <Tabs.Screen
                 name='index'
                 options={{
-                    headerShown: false,
                     title: 'Home'
                 }} />
             <Tabs.Screen
@@ -16,12 +15,12 @@ const _Layout = () => {
                     headerShown: false,
                     title: 'Collections'
                 }} />
-                <Tabs.Screen
-                    name='profile'
-                    options={{
-                        headerShown: false,
-                        title: 'Profile'
-                    }} />
+            <Tabs.Screen
+                name='profile'
+                options={{
+                    headerShown: false,
+                    title: 'Profile'
+                }} />
         </Tabs>
     )
 }
