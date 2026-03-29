@@ -100,7 +100,9 @@ function Sheet({
             <Text style={{ color: colors.text, fontSize: 18, fontWeight: '700', marginBottom: 24 }}>
               {title}
             </Text>
-            {children}
+            <ScrollView scrollEnabled={false} keyboardShouldPersistTaps="handled">
+              {children}
+            </ScrollView>
           </View>
         </Animated.View>
       </KeyboardAvoidingView>
@@ -365,10 +367,10 @@ export default function ProfileScreen() {
       <View pointerEvents="none" style={{ position: 'absolute', top: -60, right: -60, width: 260, height: 260, borderRadius: 130, backgroundColor: isDark ? 'rgba(109,40,217,0.15)' : 'rgba(139,92,246,0.07)' }} />
       <View pointerEvents="none" style={{ position: 'absolute', bottom: 80, left: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: isDark ? 'rgba(79,70,229,0.1)' : 'rgba(99,102,241,0.05)' }} />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 48 }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
 
         {/* ── Avatar / header ── */}
-        <View style={{ alignItems: 'center', paddingTop: 32, paddingBottom: 28 }}>
+        <View style={{ alignItems: 'center', paddingTop: 12, paddingBottom: 28 }}>
           <View style={{
             width: 88, height: 88, borderRadius: 44,
             backgroundColor: colors.accentSoft,
