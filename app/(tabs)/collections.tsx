@@ -1,12 +1,16 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React from 'react';
+import { View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/context/ThemeContext';
 
-const Collections = () => {
+export default function CollectionsScreen() {
+  const { colors } = useTheme();
   return (
-    <View className="flex-1 justify-center items-center">
-      <Text className="text-5xl text-primary">Collections Screen</Text>
-    </View>
-  )
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color: colors.text, fontSize: 24, fontWeight: '700' }}>Collections</Text>
+        <Text style={{ color: colors.textMuted, fontSize: 14, marginTop: 8 }}>Your card collections will appear here</Text>
+      </View>
+    </SafeAreaView>
+  );
 }
-
-export default Collections
