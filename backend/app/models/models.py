@@ -26,6 +26,26 @@ class User(Base):
     collections = relationship("Collection", back_populates="user", cascade="all, delete-orphan")
     cards = relationship("Card", back_populates="user", cascade="all, delete-orphan")
     review_logs = relationship("ReviewLog", back_populates="user", cascade="all, delete-orphan")
+    refresh_tokens = relationship("RefreshToken", back_populates="user", cascade="all, delete-orphan")
+
+
+class RefreshToken(Base):
+    """
+    Stores hashed refresh tokens — one row per active device/session.
+    Raw token is sent to client; only the SHA-256 hash is persisted so a
+    DB breach cannot be used to forge new sessions.
+    Rotation: every /refresh call revokes the incoming token and issues a new one.
+    """
+    __tablename__ = "refresh_tokens"
+
+    id = Column(String, primary_key=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False, index=True)
+    token_hash = Column(String, nullable=False, unique=True, index=True)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    revoked = Column(Boolean, default=False, nullable=False, index=True)
+
+    user = relationship("User", back_populates="refresh_tokens")
 
 
 #collection model matching Flutter collection_model.dart

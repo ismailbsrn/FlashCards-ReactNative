@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     secret_key: str = Field(...)
     algorithm: str = Field(...)
     access_token_expire_minutes: int = Field(...)
+    refresh_token_expire_days: int = Field(default=30)
     
     MIN_PASSWORD_LENGTH: int = Field(...)
     MAX_PASSWORD_LENGTH: int = Field(...)
@@ -33,6 +34,7 @@ class Settings(BaseSettings):
     EMAIL_VERIFICATION_TOKEN_EXPIRE_HOURS: int = Field(...)
     
     FRONTEND_URL: str = Field(...)
+    APP_SCHEME: str = Field(default="flashcardsapprn")
     
     MAX_LOGIN_ATTEMPTS: int = Field(...)
     LOGIN_ATTEMPT_WINDOW_MINUTES: int = Field(...)

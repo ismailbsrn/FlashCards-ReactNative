@@ -48,11 +48,28 @@ class Token(BaseModel):
 
 
 class TokenWithUser(BaseModel):
+    """Returned by /login and /register."""
     access_token: str
+    refresh_token: str
     token_type: str
     email_verified: bool
     message: Optional[str] = None
     user: UserResponse
+
+
+class TokenPair(BaseModel):
+    """Returned by /refresh — access + rotated refresh token."""
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
+class LogoutRequest(BaseModel):
+    refresh_token: str
 
 
 class TokenData(BaseModel):
