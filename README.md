@@ -19,4 +19,4 @@ oluşturuldu.
 - Uygulama güvenliğini artırmak amacıyla access + refresh token yapısına geçiş yapıldı.
 - Karanlık ve açık temalar eklendi.
 
-**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-28032026-V2](https://drive.google.com/file/d/1G3p41ZLDIeCKOWF4HYIWBzXU97sRPBsb/view?usp=share_link)
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-29032026-V2](https://drive.google.com/file/d/1HZ8TM3EDrpxIrgGCYRQvWftBZD1Yia6D/view?usp=share_link)
