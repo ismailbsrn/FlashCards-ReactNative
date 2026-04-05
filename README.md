@@ -20,3 +20,13 @@ oluşturuldu.
 - Karanlık ve açık temalar eklendi.
 
 **Video:** [22290137-İsmail-Başaran-IOS2-Dersi-29032026-V2](https://drive.google.com/file/d/1HZ8TM3EDrpxIrgGCYRQvWftBZD1Yia6D/view?usp=share_link)
+
+---
+
+### Üçüncü Hafta
+- SQL tablolarının oluşturma
+- Database işlemleri için helper objelerin ve metodların oluşturulması
+- Veri döndüren API isteklerinin tek elden yönetimi için apiRequest objesinin hazırlanması
+- TypeScript arayüzlerinin hazırlanması
+
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-05042026-V3](https://drive.google.com/file/d/1HZ8TM3EDrpxIrgGCYRQvWftBZD1Yia6D/view?usp=share_link)
