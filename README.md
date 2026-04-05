@@ -29,4 +29,4 @@ oluşturuldu.
 - Veri döndüren API isteklerinin tek elden yönetimi için apiRequest objesinin hazırlanması
 - TypeScript arayüzlerinin hazırlanması
 
-**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-05042026-V3](https://drive.google.com/file/d/1HZ8TM3EDrpxIrgGCYRQvWftBZD1Yia6D/view?usp=share_link)
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-05042026-V3](https://drive.google.com/file/d/1u6BvRXqUANGxV0pNSS8HNtAh52GnWUg-/view?usp=share_link)
