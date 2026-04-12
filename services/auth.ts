@@ -27,28 +27,21 @@ export interface TokenPair {
   token_type: string;
 }
 
-// ─── Token manager callbacks (wired by AuthContext) ───────────────────────────
-
 interface TokenManager {
   getRefreshToken: () => string | null;
   onTokensRefreshed: (pair: TokenPair) => Promise<void>;
   onLogout: () => Promise<void>;
 }
 
-let tokenManager: TokenManager | null = null;
+export let tokenManager: TokenManager | null = null;
 
 export function setTokenManager(manager: TokenManager) {
   tokenManager = manager;
 }
 
-// ─── Refresh coordination ─────────────────────────────────────────────────────
-// A single in-flight refresh promise shared by all concurrent failing requests.
-// This prevents the thundering-herd problem where 5 parallel 401s would each
-// independently try to call /refresh and rotate the token.
-
 let pendingRefresh: Promise<string> | null = null;
 
-async function attemptTokenRefresh(): Promise<string> {
+export async function attemptTokenRefresh(): Promise<string> {
   if (pendingRefresh) return pendingRefresh;
 
   pendingRefresh = (async () => {
@@ -78,8 +71,6 @@ async function attemptTokenRefresh(): Promise<string> {
   return pendingRefresh;
 }
 
-// ─── Core request helper ──────────────────────────────────────────────────────
-
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
@@ -93,7 +84,6 @@ async function request<T>(
     ...options,
   });
 
-  // On 401 — try a single token refresh then retry, unless this is /refresh itself
   if (
     response.status === 401 &&
     !_isRetry &&
@@ -113,7 +103,7 @@ async function request<T>(
             Authorization: `Bearer ${newAccessToken}`,
           },
         },
-        true  // mark as retry so we don't loop
+        true
       );
     } catch {
       throw new Error('Session expired. Please sign in again.');
@@ -129,7 +119,6 @@ async function request<T>(
   return data as T;
 }
 
-// ─── Auth service ─────────────────────────────────────────────────────────────
 
 export const authService = {
   register: (email: string, password: string, displayName?: string) =>
