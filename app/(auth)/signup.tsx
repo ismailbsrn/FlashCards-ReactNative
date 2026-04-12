@@ -31,7 +31,7 @@ export default function SignupScreen() {
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Password must be at least 8 characters');
       return;
     }
     if (password !== confirmPassword) {

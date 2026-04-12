@@ -1,12 +1,15 @@
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { exportAllData } from '@/services/importExport';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator, Alert,
   Animated,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
+  PanResponder,
   Platform,
   ScrollView,
   Switch,
@@ -52,9 +55,35 @@ function Sheet({
         Animated.timing(sheetY, {
           toValue: 600, duration: 180, useNativeDriver: true,
         }),
-      ]).start(() => setMounted(false));
+      ]).start(() => {
+        setMounted(false);
+        sheetY.setValue(600);
+      });
     }
   }, [visible]);
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 10,
+      onPanResponderMove: (_, gesture) => {
+        if (gesture.dy > 0) {
+          sheetY.setValue(gesture.dy);
+        }
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy > 120 || gesture.vy > 1.2) {
+          Keyboard.dismiss();
+          onClose();
+        } else {
+          Animated.spring(sheetY, {
+            toValue: 0, damping: 22, stiffness: 280, mass: 0.7,
+            useNativeDriver: true,
+          }).start();
+        }
+      },
+    })
+  ).current;
 
   if (!mounted) return null;
 
@@ -66,32 +95,36 @@ function Sheet({
       onRequestClose={onClose}
       statusBarTranslucent
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1, backgroundColor: 'transparent' }}
+      <Animated.View
+        style={{
+          position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.55)',
+          opacity: backdropOpacity,
+        }}
       >
-        <Animated.View
-          pointerEvents="box-none"
-          style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.55)',
-            opacity: backdropOpacity,
-          }}
-        >
-          <TouchableWithoutFeedback onPress={onClose}>
-            <View style={{ flex: 1 }} />
-          </TouchableWithoutFeedback>
-        </Animated.View>
+        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); onClose(); }}>
+          <View style={{ flex: 1 }} />
+        </TouchableWithoutFeedback>
+      </Animated.View>
 
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'position' : 'height'}
+        style={{ flex: 1, backgroundColor: 'transparent' }}
+        contentContainerStyle={{ flex: 1 }}
+        pointerEvents="box-none"
+      >
         <View style={{ flex: 1 }} pointerEvents="none" />
 
-        <Animated.View style={{ transform: [{ translateY: sheetY }] }}>
-          <View style={{
-            backgroundColor: colors.sheetBg,
-            borderTopLeftRadius: 24, borderTopRightRadius: 24,
-            borderWidth: 1, borderColor: colors.surfaceBorder,
-            paddingHorizontal: 24, paddingTop: 16, paddingBottom: 36,
-          }}>
+        <Animated.View style={{ transform: [{ translateY: sheetY }] }} pointerEvents="box-none">
+          <View 
+            {...panResponder.panHandlers}
+            style={{
+              backgroundColor: colors.sheetBg,
+              borderTopLeftRadius: 24, borderTopRightRadius: 24,
+              borderWidth: 1, borderColor: colors.surfaceBorder,
+              paddingHorizontal: 24, paddingTop: 16, paddingBottom: 36,
+            }}
+          >
             <View style={{
               width: 40, height: 4, borderRadius: 2,
               backgroundColor: colors.divider,
@@ -325,7 +358,7 @@ export default function ProfileScreen() {
   async function savePassword() {
     if (!currentPw || !newPw || !confirmPw) { setError('All fields are required'); return; }
     if (newPw !== confirmPw)                { setError('New passwords do not match'); return; }
-    if (newPw.length < 6)                  { setError('Password must be at least 6 characters'); return; }
+    if (newPw.length < 6)                  { setError('Password must be at least 8 characters'); return; }
     setSaving(true); setError('');
     try {
       await changePassword(currentPw, newPw);
@@ -367,7 +400,7 @@ export default function ProfileScreen() {
       <View pointerEvents="none" style={{ position: 'absolute', top: -60, right: -60, width: 260, height: 260, borderRadius: 130, backgroundColor: isDark ? 'rgba(109,40,217,0.15)' : 'rgba(139,92,246,0.07)' }} />
       <View pointerEvents="none" style={{ position: 'absolute', bottom: 80, left: -60, width: 220, height: 220, borderRadius: 110, backgroundColor: isDark ? 'rgba(79,70,229,0.1)' : 'rgba(99,102,241,0.05)' }} />
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="handled">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 48 }} keyboardShouldPersistTaps="always">
 
         {/* ── Avatar / header ── */}
         <View style={{ alignItems: 'center', paddingTop: 12, paddingBottom: 28 }}>
@@ -432,6 +465,25 @@ export default function ProfileScreen() {
             <Row icon="phone-portrait-outline" label="Sign Out All Devices" onPress={handleLogoutAll} />
           </SectionCard>
 
+          {/* ── Data ── */}
+          <SectionLabel label="Data" />
+          <SectionCard>
+            <Row 
+              icon="download-outline" 
+              label="Export All Data" 
+              value="Export all decks and cards to JSON" 
+              onPress={async () => {
+                if (user) {
+                  try {
+                    await exportAllData(user.id);
+                  } catch (e: any) {
+                    Alert.alert('Export Failed', e.message);
+                  }
+                }
+              }} 
+            />
+          </SectionCard>
+
           {/* ── Danger zone ── */}
           <SectionLabel label="Danger Zone" />
           <SectionCard>
@@ -470,7 +522,7 @@ export default function ProfileScreen() {
       <Sheet visible={showPassword} title="Change Password" onClose={() => setShowPassword(false)}>
         <ErrorBanner msg={error} />
         <SheetInput label="Current Password"     value={currentPw}  onChangeText={setCurrentPw}  placeholder="••••••••" secure />
-        <SheetInput label="New Password"         value={newPw}      onChangeText={setNewPw}      placeholder="Min. 6 characters" secure />
+        <SheetInput label="New Password"         value={newPw}      onChangeText={setNewPw}      placeholder="Min. 8 characters" secure />
         <SheetInput label="Confirm New Password" value={confirmPw}  onChangeText={setConfirmPw}  placeholder="Re-enter new password" secure />
         <PrimaryBtn label="Update Password" onPress={savePassword} loading={saving} />
       </Sheet>
