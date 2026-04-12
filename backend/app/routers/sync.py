@@ -42,6 +42,18 @@ def sync(
                     if coll_update.is_deleted is not None:
                         existing.is_deleted = coll_update.is_deleted
                     existing.version = coll_update.version
+            else:
+                new_col = Collection(
+                    id=coll_update.id,
+                    user_id=current_user.id,
+                    name=coll_update.name or "",
+                    description=coll_update.description,
+                    tags=",".join(coll_update.tags) if coll_update.tags else "",
+                    color=coll_update.color,
+                    is_deleted=coll_update.is_deleted or False,
+                    version=coll_update.version
+                )
+                db.add(new_col)
     
     if sync_data.cards:
         for card_update in sync_data.cards:
@@ -72,6 +84,22 @@ def sync(
                     if card_update.is_deleted is not None:
                         existing.is_deleted = card_update.is_deleted
                     existing.version = card_update.version
+            else:
+                new_card = Card(
+                    id=card_update.id,
+                    user_id=current_user.id,
+                    collection_id=card_update.collection_id,
+                    front=card_update.front or "",
+                    back=card_update.back or "",
+                    ease_factor=card_update.ease_factor or 2.5,
+                    interval=card_update.interval or 0,
+                    repetitions=card_update.repetitions or 0,
+                    next_review_date=card_update.next_review_date,
+                    last_review_date=card_update.last_review_date,
+                    is_deleted=card_update.is_deleted or False,
+                    version=card_update.version
+                )
+                db.add(new_card)
     
     if sync_data.review_logs:
         for log_create in sync_data.review_logs:
@@ -85,8 +113,10 @@ def sync(
                     user_id=current_user.id,
                     card_id=log_create.card_id,
                     quality=log_create.quality,
-                    ease_factor=log_create.ease_factor,
-                    interval=log_create.interval,
+                    interval_before=log_create.interval_before,
+                    interval_after=log_create.interval_after,
+                    ease_factor_before=log_create.ease_factor_before,
+                    ease_factor_after=log_create.ease_factor_after,
                     reviewed_at=log_create.reviewed_at or datetime.utcnow()
                 )
                 db.add(log)

@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 # ==========================================
@@ -102,12 +102,22 @@ class CollectionBase(BaseModel):
     tags: Optional[list[str]] = None
     color: Optional[str] = None
 
+    @field_validator('tags', mode='before')
+    @classmethod
+    def parse_tags(cls, v):
+        if isinstance(v, str):
+            if v.strip():
+                return [t.strip() for t in v.split(',')]
+            return []
+        return v
+
 
 class CollectionCreate(CollectionBase):
     id: Optional[str] = None
 
 
 class CollectionUpdate(BaseModel):
+    id: str
     name: Optional[str] = None
     description: Optional[str] = None
     tags: Optional[list[str]] = None
@@ -148,6 +158,7 @@ class CardCreate(CardBase):
 
 
 class CardUpdate(BaseModel):
+    id: str
     front: Optional[str] = None
     back: Optional[str] = None
     collection_id: Optional[str] = None
