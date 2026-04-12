@@ -30,3 +30,13 @@ oluşturuldu.
 - TypeScript arayüzlerinin hazırlanması
 
 **Video:** [22290137-İsmail-Başaran-IOS2-Dersi-05042026-V3](https://drive.google.com/file/d/1u6BvRXqUANGxV0pNSS8HNtAh52GnWUg-/view?usp=share_link)
+
+---
+
+### Dördüncü Hafta
+(vize haftası sebebiyle az miktarda ilerleme kayedilmiştir)
+- Koleksiyonlar sayfası eklendi.
+- Koleksiyon sayfaları eklendi.
+- Koleksiyonlarla ilgili sayfalara ilgili butonlar eklendi. Sonrasında bağlantıları yapılacak.
+
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-12042026-V4](https://drive.google.com/file/d/1HL3roh3Gtv0bev3XWKdDbMSDhz9iRSTO/view?usp=share_link)
