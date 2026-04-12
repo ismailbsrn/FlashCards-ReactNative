@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import * as SecureStore from 'expo-secure-store';
 import { authService, setTokenManager, TokenPair, TokenWithUser, UserResponse } from '@/services/auth';
+import * as db from '@/services/database';
+import * as SecureStore from 'expo-secure-store';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 
 interface AuthState {
   token: string | null;
@@ -34,11 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isEmailVerified: false,
   });
 
-  // Keep refresh token in a ref so the token manager closure always sees the latest value
-  // without causing re-renders (it's never directly rendered)
   const refreshTokenRef = useRef<string | null>(null);
-
-  // ── Persist helpers ─────────────────────────────────────────────────────────
 
   const saveTokens = async (accessToken: string, refreshToken: string, user: UserResponse) => {
     refreshTokenRef.current = refreshToken;
@@ -56,22 +53,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
       SecureStore.deleteItemAsync(USER_KEY),
     ]);
+    // TODO - dev only. will be removed.
+    try {
+      await db.clearAllData();
+    } catch {}
   };
-
-  // ── Logout (defined early so token manager can reference it) ─────────────────
 
   const logout = async () => {
     const refreshToken = refreshTokenRef.current;
     await clearStorage();
     setState({ token: null, user: null, isLoading: false, isEmailVerified: false });
 
-    // Best-effort server-side revocation — don't block or throw on failure
     if (refreshToken) {
-      authService.logout(refreshToken).catch(() => {});
+      authService.logout(refreshToken).catch(() => { });
     }
   };
 
-  // ── Wire the token manager so the fetch interceptor can auto-refresh ─────────
 
   useEffect(() => {
     setTokenManager({
@@ -79,7 +76,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       onTokensRefreshed: async (pair: TokenPair) => {
         refreshTokenRef.current = pair.refresh_token;
-        // Update the access token in SecureStore and state; keep existing user object
         const userJson = await SecureStore.getItemAsync(USER_KEY);
         const user = userJson ? (JSON.parse(userJson) as UserResponse) : state.user;
         await Promise.all([
@@ -87,15 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           SecureStore.setItemAsync(REFRESH_TOKEN_KEY, pair.refresh_token),
         ]);
         setState(prev => ({ ...prev, token: pair.access_token }));
-        // If user is somehow null, keep whatever we have
         if (user) setState(prev => ({ ...prev, user }));
       },
 
       onLogout: logout,
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Bootstrap: restore session from secure storage ───────────────────────────
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -123,8 +116,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })();
   }, []);
-
-  // ── Auth actions ─────────────────────────────────────────────────────────────
 
   const login = async (email: string, password: string) => {
     const result = await authService.login(email, password);
@@ -157,14 +148,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await SecureStore.setItemAsync(USER_KEY, JSON.stringify(user));
       setState(prev => ({ ...prev, user, isEmailVerified: user.is_email_verified }));
     } catch {
-      // The fetch interceptor already handles 401 → auto-refresh → retry,
-      // so if we reach here the token is truly unrecoverable.
+      // if we reach here the token is truly unrecoverable.
     }
   };
 
   const logoutAll = async () => {
     if (state.token) {
-      await authService.logoutAll(state.token).catch(() => {});
+      await authService.logoutAll(state.token).catch(() => { });
     }
     await clearStorage();
     setState({ token: null, user: null, isLoading: false, isEmailVerified: false });
@@ -180,7 +170,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const changePassword = async (currentPassword: string, newPassword: string) => {
     if (!state.token) throw new Error('Not authenticated');
     await authService.changePassword(state.token, currentPassword, newPassword);
-    // Backend revokes all sessions after password change — force local logout
     await clearStorage();
     setState({ token: null, user: null, isLoading: false, isEmailVerified: false });
   };
