@@ -46,4 +46,4 @@ oluşturuldu.
 ### Beşinci Hafta
 - Senkronizasyon servisi eklendi eklendi.
 
-**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-26042026-V5]()
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-26042026-V5](https://drive.google.com/file/d/1KfK3CGr2FQoxE6EE1O4tpU0ZmEyrSxF5/view?usp=share_link)
