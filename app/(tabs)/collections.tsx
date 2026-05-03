@@ -1,3 +1,4 @@
+import ColorPicker from '@/components/ColorPicker';
 import Sheet, { ErrorBanner, SheetInput } from '@/components/Sheet';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -14,8 +15,9 @@ import {
   FlatList,
   RefreshControl,
   Text,
+  TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -326,6 +328,14 @@ export default function CollectionsScreen() {
                     ) : null}
                     {col.tags.length > 0 && (
                       <View style={{ flexDirection: 'row', gap: 6, marginTop: 6, flexWrap: 'wrap' }}>
+                        {col.tags.slice(0, 3).map((tag) => (
+                          <View key={tag} style={{
+                            backgroundColor: colors.accentSoft, borderRadius: 8,
+                            paddingHorizontal: 8, paddingVertical: 2,
+                          }}>
+                            <Text style={{ color: colors.accentLight, fontSize: 11, fontWeight: '500' }}>{tag}</Text>
+                          </View>
+                        ))}
                       </View>
                     )}
                   </View>
@@ -343,6 +353,54 @@ export default function CollectionsScreen() {
         <SheetInput label="Name" value={name} onChangeText={setName} placeholder="Collection name" autoCapitalize="words" />
         <SheetInput label="Description (optional)" value={description} onChangeText={setDescription} placeholder="Short description" multiline autoCapitalize="sentences" />
 
+        {/* Tags */}
+        <View style={{ marginBottom: 16 }}>
+          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Tags</Text>
+          <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+            <View style={{
+              flex: 1, flexDirection: 'row', alignItems: 'center',
+              backgroundColor: colors.inputBg, borderWidth: 1, borderColor: colors.inputBorder,
+              borderRadius: 14, paddingHorizontal: 16, height: 44,
+            }}>
+              <TextInput
+                style={{ flex: 1, color: colors.text, fontSize: 14 }}
+                placeholder="Add tag"
+                placeholderTextColor={colors.textMuted}
+                value={tagInput}
+                onChangeText={setTagInput}
+                onSubmitEditing={addTag}
+                returnKeyType="done"
+              />
+            </View>
+            <TouchableOpacity
+              onPress={addTag}
+              style={{
+                width: 44, height: 44, borderRadius: 14,
+                backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <Ionicons name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          {tags.length > 0 && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
+              {tags.map((tag) => (
+                <View key={tag} style={{
+                  flexDirection: 'row', alignItems: 'center', gap: 4,
+                  backgroundColor: colors.accentSoft, borderRadius: 10,
+                  paddingHorizontal: 10, paddingVertical: 5,
+                }}>
+                  <Text style={{ color: colors.accentLight, fontSize: 13 }}>{tag}</Text>
+                  <TouchableOpacity onPress={() => setTags(prev => prev.filter(t => t !== tag))}>
+                    <Ionicons name="close-circle" size={16} color={colors.accentLight} />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+
+        <ColorPicker selected={selectedColor} onSelect={setSelectedColor} />
 
         <TouchableOpacity
           onPress={saveCollection}
