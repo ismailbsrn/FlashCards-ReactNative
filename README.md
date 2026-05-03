@@ -47,3 +47,15 @@ oluşturuldu.
 - Senkronizasyon servisi eklendi eklendi.
 
 **Video:** [22290137-İsmail-Başaran-IOS2-Dersi-26042026-V5](https://drive.google.com/file/d/1KfK3CGr2FQoxE6EE1O4tpU0ZmEyrSxF5/view?usp=share_link)
+
+---
+
+### Altıncı Hafta
+- JSON dışa aktarma.
+- JSON içe aktarma.
+- CSV içe aktarma.
+- Renk seçici.
+- Etiket özelliği.
+
+
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-03052026-V6](https://drive.google.com/file/d/13eSVlbaQe-pCT7SjVrRhimPW1q_MyIYd/view?usp=share_link)
