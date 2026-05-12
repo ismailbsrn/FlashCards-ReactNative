@@ -59,3 +59,13 @@ oluşturuldu.
 
 
 **Video:** [22290137-İsmail-Başaran-IOS2-Dersi-03052026-V6](https://drive.google.com/file/d/13eSVlbaQe-pCT7SjVrRhimPW1q_MyIYd/view?usp=share_link)
+
+---
+
+### Yedinci Hafta
+- Kart çevirme animasyonları.
+- Tage ve öğrenme durumuna göre filtreleme.
+- Koleksiyon seçme.
+
+
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-12052026-V7](https://drive.google.com/file/d/1FoZPNGpIa8t4ZI7cXXQJCqylgQ-M-RyL/view?usp=share_link)
