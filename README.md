@@ -69,3 +69,11 @@ oluşturuldu.
 
 
 **Video:** [22290137-İsmail-Başaran-IOS2-Dersi-12052026-V7](https://drive.google.com/file/d/1FoZPNGpIa8t4ZI7cXXQJCqylgQ-M-RyL/view?usp=share_link)
+
+---
+
+### Sekizinci Hafta
+- Spaced Repetition algoritması entegre edildi.
+
+
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-17052026-V8](https://drive.google.com/file/d/1k440TGQCrpT-K6roFozB7bIxFBK7oRPF/view?usp=share_link)
