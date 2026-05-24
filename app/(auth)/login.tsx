@@ -2,6 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -16,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +26,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
-      setError('Please fill in all fields');
+      setError(t.login.fillAllFields);
       return;
     }
 
@@ -39,7 +41,7 @@ export default function LoginScreen() {
         router.replace('/(tabs)');
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      setError(err instanceof Error ? err.message : t.login.loginFailed);
     } finally {
       setIsLoading(false);
     }
@@ -74,10 +76,10 @@ export default function LoginScreen() {
                 <Ionicons name="layers" size={38} color="#8B5CF6" />
               </View>
               <Text style={{ color: '#FFFFFF', fontSize: 32, fontWeight: '700', letterSpacing: -0.5 }}>
-                Welcome back
+                {t.login.welcomeBack}
               </Text>
               <Text style={{ color: '#6B7280', fontSize: 15, marginTop: 8 }}>
-                Sign in to continue learning
+                {t.login.signInToContinue}
               </Text>
             </View>
 
@@ -95,7 +97,7 @@ export default function LoginScreen() {
 
             {/* Email field */}
             <View style={{ marginBottom: 16 }}>
-              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Email</Text>
+              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.login.email}</Text>
               <View style={{
                 flexDirection: 'row', alignItems: 'center',
                 backgroundColor: 'rgba(255,255,255,0.05)',
@@ -105,7 +107,7 @@ export default function LoginScreen() {
                 <Ionicons name="mail-outline" size={20} color="#6B7280" />
                 <TextInput
                   style={{ flex: 1, color: '#FFFFFF', marginLeft: 12, fontSize: 15 }}
-                  placeholder="your@email.com"
+                  placeholder={t.login.emailPlaceholder}
                   placeholderTextColor="#4B5563"
                   value={email}
                   onChangeText={setEmail}
@@ -119,7 +121,7 @@ export default function LoginScreen() {
 
             {/* Password field */}
             <View style={{ marginBottom: 12 }}>
-              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Password</Text>
+              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.login.password}</Text>
               <View style={{
                 flexDirection: 'row', alignItems: 'center',
                 backgroundColor: 'rgba(255,255,255,0.05)',
@@ -129,7 +131,7 @@ export default function LoginScreen() {
                 <Ionicons name="lock-closed-outline" size={20} color="#6B7280" />
                 <TextInput
                   style={{ flex: 1, color: '#FFFFFF', marginLeft: 12, fontSize: 15 }}
-                  placeholder="••••••••"
+                  placeholder={t.login.passwordPlaceholder}
                   placeholderTextColor="#4B5563"
                   value={password}
                   onChangeText={setPassword}
@@ -152,7 +154,7 @@ export default function LoginScreen() {
             {/* Forgot password */}
             <View style={{ alignItems: 'flex-end', marginBottom: 28 }}>
               <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')} hitSlop={8}>
-                <Text style={{ color: '#8B5CF6', fontSize: 13, fontWeight: '500' }}>Forgot password?</Text>
+                <Text style={{ color: '#8B5CF6', fontSize: 13, fontWeight: '500' }}>{t.login.forgotPassword}</Text>
               </TouchableOpacity>
             </View>
 
@@ -172,15 +174,15 @@ export default function LoginScreen() {
             >
               {isLoading
                 ? <ActivityIndicator color="#FFFFFF" />
-                : <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>Sign In</Text>
+                : <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>{t.login.signIn}</Text>
               }
             </TouchableOpacity>
 
             {/* Sign up link */}
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 32 }}>
-              <Text style={{ color: '#6B7280', fontSize: 14 }}>Don't have an account? </Text>
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>{t.login.noAccount}</Text>
               <TouchableOpacity onPress={() => router.push('/(auth)/signup')} hitSlop={8}>
-                <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '600' }}>Sign up</Text>
+                <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '600' }}>{t.login.signUp}</Text>
               </TouchableOpacity>
             </View>
 

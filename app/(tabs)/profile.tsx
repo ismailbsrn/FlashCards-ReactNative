@@ -1,5 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { languageMeta, type Language } from '@/i18n';
 import { exportAllData } from '@/services/importExport';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect, useRef, useState } from 'react';
@@ -300,11 +302,13 @@ function ErrorBanner({ msg }: { msg: string }) {
 export default function ProfileScreen() {
   const { user, logout, logoutAll, updateProfile, changePassword, deleteAccount } = useAuth();
   const { colors, isDark, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
 
   const [showName, setShowName]         = useState(false);
   const [showEmail, setShowEmail]       = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showDelete, setShowDelete]     = useState(false);
+  const [showLanguage, setShowLanguage] = useState(false);
 
   const [nameVal, setNameVal]   = useState('');
   const [emailVal, setEmailVal] = useState('');
@@ -334,12 +338,12 @@ export default function ProfileScreen() {
       await updateProfile({ display_name: nameVal.trim() || null });
       setShowName(false);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to update');
+      setError(e instanceof Error ? e.message : t.profile.updateFailed);
     } finally { setSaving(false); }
   }
 
   async function saveEmail() {
-    if (!emailVal.trim()) { setError('Email cannot be empty'); return; }
+    if (!emailVal.trim()) { setError(t.profile.emailEmpty); return; }
     setSaving(true); setError('');
     try {
       await updateProfile({ email: emailVal.trim().toLowerCase() });
@@ -348,49 +352,49 @@ export default function ProfileScreen() {
       const msg = e instanceof Error ? e.message : '';
       if (msg.includes('verify') || msg.includes('403')) {
         setShowEmail(false);
-        Alert.alert('Verify your new email', 'Check your inbox for a verification link, then sign in again.');
+        Alert.alert(t.profile.verifyNewEmail, t.profile.verifyNewEmailMsg);
       } else {
-        setError(msg || 'Failed to update email');
+        setError(msg || t.profile.emailUpdateFailed);
       }
     } finally { setSaving(false); }
   }
 
   async function savePassword() {
-    if (!currentPw || !newPw || !confirmPw) { setError('All fields are required'); return; }
-    if (newPw !== confirmPw)                { setError('New passwords do not match'); return; }
-    if (newPw.length < 6)                  { setError('Password must be at least 8 characters'); return; }
+    if (!currentPw || !newPw || !confirmPw) { setError(t.profile.allFieldsRequired); return; }
+    if (newPw !== confirmPw)                { setError(t.profile.passwordsDontMatch); return; }
+    if (newPw.length < 6)                  { setError(t.profile.passwordTooShort); return; }
     setSaving(true); setError('');
     try {
       await changePassword(currentPw, newPw);
       setShowPassword(false);
-      Alert.alert('Password changed', 'You have been signed out from all devices.');
+      Alert.alert(t.profile.passwordChanged, t.profile.passwordChangedMsg);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to change password');
+      setError(e instanceof Error ? e.message : t.profile.passwordChangeFailed);
     } finally { setSaving(false); }
   }
 
   async function confirmDelete() {
-    if (!deletePw) { setError('Enter your password to confirm'); return; }
+    if (!deletePw) { setError(t.profile.enterPasswordToConfirm); return; }
     setSaving(true); setError('');
     try {
       await deleteAccount(deletePw);
       setShowDelete(false);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Failed to delete account');
+      setError(e instanceof Error ? e.message : t.profile.deleteAccountFailed);
     } finally { setSaving(false); }
   }
 
   function handleLogout() {
-    Alert.alert('Sign out', 'Are you sure?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign out', style: 'destructive', onPress: logout },
+    Alert.alert(t.profile.signOut, t.profile.signOutConfirm, [
+      { text: t.common.cancel, style: 'cancel' },
+      { text: t.profile.signOutBtn, style: 'destructive', onPress: logout },
     ]);
   }
 
   function handleLogoutAll() {
-    Alert.alert('Sign out everywhere', 'This will sign you out from all devices.', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Sign out all', style: 'destructive', onPress: logoutAll },
+    Alert.alert(t.profile.signOutAll, t.profile.signOutAllConfirm, [
+      { text: t.common.cancel, style: 'cancel' },
+      { text: t.profile.signOutAllBtn, style: 'destructive', onPress: logoutAll },
     ]);
   }
 
@@ -413,7 +417,7 @@ export default function ProfileScreen() {
             <Text style={{ color: colors.accentLight, fontSize: 30, fontWeight: '700' }}>{initials}</Text>
           </View>
           <Text style={{ color: colors.text, fontSize: 20, fontWeight: '700' }}>
-            {user?.display_name ?? 'No name set'}
+            {user?.display_name ?? t.profile.noNameSet}
           </Text>
           <Text style={{ color: colors.textMuted, fontSize: 14, marginTop: 4 }}>{user?.email}</Text>
           <View style={{
@@ -423,28 +427,28 @@ export default function ProfileScreen() {
             borderRadius: 20, paddingHorizontal: 12, paddingVertical: 4,
           }}>
             <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#4ADE80' }} />
-            <Text style={{ color: '#4ADE80', fontSize: 12, fontWeight: '600' }}>Verified</Text>
+            <Text style={{ color: '#4ADE80', fontSize: 12, fontWeight: '600' }}>{t.profile.verified}</Text>
           </View>
         </View>
 
         <View style={{ paddingHorizontal: 16 }}>
 
           {/* ── Account ── */}
-          <SectionLabel label="Account" />
+          <SectionLabel label={t.profile.sectionAccount} />
           <SectionCard>
-            <Row icon="person-outline"      label="Display Name"   value={user?.display_name ?? 'Not set'} onPress={() => openSheet('name')} />
+            <Row icon="person-outline"      label={t.profile.displayName}   value={user?.display_name ?? t.profile.notSet} onPress={() => openSheet('name')} />
             <Divider />
-            <Row icon="mail-outline"        label="Email Address"  value={user?.email}                     onPress={() => openSheet('email')} />
+            <Row icon="mail-outline"        label={t.profile.emailAddress}  value={user?.email}                     onPress={() => openSheet('email')} />
             <Divider />
-            <Row icon="lock-closed-outline" label="Change Password"                                         onPress={() => openSheet('password')} />
+            <Row icon="lock-closed-outline" label={t.profile.changePassword}                                         onPress={() => openSheet('password')} />
           </SectionCard>
 
           {/* ── Appearance ── */}
-          <SectionLabel label="Appearance" />
+          <SectionLabel label={t.profile.sectionAppearance} />
           <SectionCard>
             <Row
               icon={isDark ? 'moon' : 'sunny'}
-              label={isDark ? 'Dark Mode' : 'Light Mode'}
+              label={isDark ? t.profile.darkMode : t.profile.lightMode}
               right={
                 <Switch
                   value={isDark}
@@ -455,29 +459,36 @@ export default function ProfileScreen() {
                 />
               }
             />
+            <Divider />
+            <Row
+              icon="language-outline"
+              label={t.profile.language}
+              value={languageMeta[language].flag + ' ' + languageMeta[language].name}
+              onPress={() => setShowLanguage(true)}
+            />
           </SectionCard>
 
           {/* ── Sessions ── */}
-          <SectionLabel label="Sessions" />
+          <SectionLabel label={t.profile.sectionSessions} />
           <SectionCard>
-            <Row icon="log-out-outline"        label="Sign Out"             onPress={handleLogout} />
+            <Row icon="log-out-outline"        label={t.profile.signOut}             onPress={handleLogout} />
             <Divider />
-            <Row icon="phone-portrait-outline" label="Sign Out All Devices" onPress={handleLogoutAll} />
+            <Row icon="phone-portrait-outline" label={t.profile.signOutAll} onPress={handleLogoutAll} />
           </SectionCard>
 
           {/* ── Data ── */}
-          <SectionLabel label="Data" />
+          <SectionLabel label={t.profile.sectionData} />
           <SectionCard>
             <Row 
               icon="download-outline" 
-              label="Export All Data" 
-              value="Export all decks and cards to JSON" 
+              label={t.profile.exportAllData} 
+              value={t.profile.exportAllDataDesc} 
               onPress={async () => {
                 if (user) {
                   try {
                     await exportAllData(user.id);
                   } catch (e: any) {
-                    Alert.alert('Export Failed', e.message);
+                    Alert.alert(t.profile.exportFailed, e.message);
                   }
                 }
               }} 
@@ -485,23 +496,23 @@ export default function ProfileScreen() {
           </SectionCard>
 
           {/* ── Danger zone ── */}
-          <SectionLabel label="Danger Zone" />
+          <SectionLabel label={t.profile.sectionDangerZone} />
           <SectionCard>
-            <Row icon="trash-outline" label="Delete Account" onPress={() => openSheet('delete')} danger />
+            <Row icon="trash-outline" label={t.profile.deleteAccount} onPress={() => openSheet('delete')} danger />
           </SectionCard>
 
         </View>
       </ScrollView>
 
       {/* ── Edit Display Name ── */}
-      <Sheet visible={showName} title="Display Name" onClose={() => setShowName(false)}>
+      <Sheet visible={showName} title={t.profile.displayNameTitle} onClose={() => setShowName(false)}>
         <ErrorBanner msg={error} />
-        <SheetInput label="Name" value={nameVal} onChangeText={setNameVal} placeholder="Your name" autoCapitalize="words" />
-        <PrimaryBtn label="Save" onPress={saveName} loading={saving} />
+        <SheetInput label={t.profile.displayName} value={nameVal} onChangeText={setNameVal} placeholder={t.profile.namePlaceholder} autoCapitalize="words" />
+        <PrimaryBtn label={t.common.save} onPress={saveName} loading={saving} />
       </Sheet>
 
       {/* ── Edit Email ── */}
-      <Sheet visible={showEmail} title="Email Address" onClose={() => setShowEmail(false)}>
+      <Sheet visible={showEmail} title={t.profile.emailTitle} onClose={() => setShowEmail(false)}>
         <ErrorBanner msg={error} />
         <View style={{
           flexDirection: 'row', alignItems: 'flex-start', gap: 10,
@@ -511,24 +522,24 @@ export default function ProfileScreen() {
         }}>
           <Ionicons name="warning-outline" size={16} color="#FBBF24" style={{ marginTop: 1 }} />
           <Text style={{ color: '#FCD34D', fontSize: 13, flex: 1, lineHeight: 18 }}>
-            Changing your email requires re-verification. You'll be signed out after saving.
+            {t.profile.emailWarning}
           </Text>
         </View>
-        <SheetInput label="New Email" value={emailVal} onChangeText={setEmailVal} placeholder="new@email.com" keyboardType="email-address" />
-        <PrimaryBtn label="Save & Re-verify" onPress={saveEmail} loading={saving} />
+        <SheetInput label={t.profile.newEmailLabel} value={emailVal} onChangeText={setEmailVal} placeholder={t.profile.newEmailPlaceholder} keyboardType="email-address" />
+        <PrimaryBtn label={t.profile.saveAndReverify} onPress={saveEmail} loading={saving} />
       </Sheet>
 
       {/* ── Change Password ── */}
-      <Sheet visible={showPassword} title="Change Password" onClose={() => setShowPassword(false)}>
+      <Sheet visible={showPassword} title={t.profile.passwordTitle} onClose={() => setShowPassword(false)}>
         <ErrorBanner msg={error} />
-        <SheetInput label="Current Password"     value={currentPw}  onChangeText={setCurrentPw}  placeholder="••••••••" secure />
-        <SheetInput label="New Password"         value={newPw}      onChangeText={setNewPw}      placeholder="Min. 8 characters" secure />
-        <SheetInput label="Confirm New Password" value={confirmPw}  onChangeText={setConfirmPw}  placeholder="Re-enter new password" secure />
-        <PrimaryBtn label="Update Password" onPress={savePassword} loading={saving} />
+        <SheetInput label={t.profile.currentPasswordLabel}     value={currentPw}  onChangeText={setCurrentPw}  placeholder="••••••••" secure />
+        <SheetInput label={t.profile.newPasswordLabel}         value={newPw}      onChangeText={setNewPw}      placeholder={t.profile.newPasswordPlaceholder} secure />
+        <SheetInput label={t.profile.confirmNewPasswordLabel} value={confirmPw}  onChangeText={setConfirmPw}  placeholder={t.profile.confirmPasswordPlaceholder} secure />
+        <PrimaryBtn label={t.profile.updatePassword} onPress={savePassword} loading={saving} />
       </Sheet>
 
       {/* ── Delete Account ── */}
-      <Sheet visible={showDelete} title="Delete Account" onClose={() => setShowDelete(false)}>
+      <Sheet visible={showDelete} title={t.profile.deleteAccountTitle} onClose={() => setShowDelete(false)}>
         <ErrorBanner msg={error} />
         <View style={{
           flexDirection: 'row', alignItems: 'flex-start', gap: 10,
@@ -538,11 +549,30 @@ export default function ProfileScreen() {
         }}>
           <Ionicons name="alert-circle-outline" size={16} color="#F87171" style={{ marginTop: 1 }} />
           <Text style={{ color: '#FCA5A5', fontSize: 13, flex: 1, lineHeight: 18 }}>
-            This permanently deletes your account and all data. This cannot be undone.
+            {t.profile.deleteAccountWarning}
           </Text>
         </View>
-        <SheetInput label="Confirm Password" value={deletePw} onChangeText={setDeletePw} placeholder="Enter your password" secure />
-        <PrimaryBtn label="Delete My Account" onPress={confirmDelete} loading={saving} danger />
+        <SheetInput label={t.profile.confirmPasswordLabel} value={deletePw} onChangeText={setDeletePw} placeholder={t.profile.confirmPasswordPlaceholder} secure />
+        <PrimaryBtn label={t.profile.deleteMyAccount} onPress={confirmDelete} loading={saving} danger />
+      </Sheet>
+
+      {/* ── Language Picker ── */}
+      <Sheet visible={showLanguage} title={t.profile.selectLanguage} onClose={() => setShowLanguage(false)}>
+        {(Object.keys(languageMeta) as Language[]).map((lang) => (
+          <TouchableOpacity
+            key={lang}
+            onPress={() => { setLanguage(lang); setShowLanguage(false); }}
+            activeOpacity={0.7}
+            style={{
+              flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 4,
+              borderBottomWidth: lang !== 'tr' ? 1 : 0, borderBottomColor: colors.divider,
+            }}
+          >
+            <Text style={{ fontSize: 22, marginRight: 14 }}>{languageMeta[lang].flag}</Text>
+            <Text style={{ color: colors.text, fontSize: 16, fontWeight: '500', flex: 1 }}>{languageMeta[lang].name}</Text>
+            {language === lang && <Ionicons name="checkmark-circle" size={22} color={colors.accentLight} />}
+          </TouchableOpacity>
+        ))}
       </Sheet>
 
     </SafeAreaView>

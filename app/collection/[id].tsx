@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
 import * as db from '@/services/database';
 import { performSync } from '@/services/sync';
 import Sheet, { SheetInput, ErrorBanner } from '@/components/Sheet';
@@ -24,6 +25,7 @@ export default function CollectionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
   const { colors, isDark } = useTheme();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [collection, setCollection] = useState<Collection | null>(null);
@@ -106,7 +108,7 @@ export default function CollectionDetailScreen() {
   }
 
   async function saveCollectionEdits() {
-    if (!editName.trim()) { setError('Name is required'); return; }
+    if (!editName.trim()) { setError(t.collectionDetail.nameRequired); return; }
     if (!collection) return;
     setSaving(true);
     setError('');
@@ -124,7 +126,7 @@ export default function CollectionDetailScreen() {
       await loadData();
       performSync().catch(() => {});
     } catch (e: any) {
-      setError(e.message ?? 'Failed to save');
+      setError(e.message ?? t.profile.updateFailed);
     } finally {
       setSaving(false);
     }
@@ -133,10 +135,10 @@ export default function CollectionDetailScreen() {
   // ─── Delete Collection ───────────────────────────────────────────────────────
 
   function confirmDeleteCollection() {
-    Alert.alert('Delete Collection', 'This will delete the collection and all its cards.', [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t.collectionDetail.deleteCollection, t.collectionDetail.deleteCollectionMsg, [
+      { text: t.common.cancel, style: 'cancel' },
       {
-        text: 'Delete', style: 'destructive',
+        text: t.common.delete, style: 'destructive',
         onPress: async () => {
           if (!collection) return;
           await db.deleteCollection(collection.id);
@@ -162,10 +164,10 @@ export default function CollectionDetailScreen() {
   }
 
   async function bulkDeleteCards() {
-    Alert.alert('Delete Cards', `Delete ${selectedIds.size} card(s)?`, [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t.collectionDetail.deleteCards, t.collectionDetail.deleteCardsMsg(selectedIds.size), [
+      { text: t.common.cancel, style: 'cancel' },
       {
-        text: 'Delete', style: 'destructive',
+        text: t.common.delete, style: 'destructive',
         onPress: async () => {
           for (const cid of selectedIds) {
             await db.deleteCard(cid);
@@ -194,7 +196,7 @@ export default function CollectionDetailScreen() {
   if (!collection) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: colors.textMuted }}>Collection not found</Text>
+        <Text style={{ color: colors.textMuted }}>{t.collectionDetail.collectionNotFound}</Text>
       </SafeAreaView>
     );
   }
@@ -244,7 +246,7 @@ export default function CollectionDetailScreen() {
         <Ionicons name="search-outline" size={18} color={colors.textMuted} />
         <TextInput
           style={{ flex: 1, color: colors.text, fontSize: 14, marginLeft: 10 }}
-          placeholder="Search cards..."
+          placeholder={t.collectionDetail.searchPlaceholder}
           placeholderTextColor={colors.textMuted}
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -260,7 +262,7 @@ export default function CollectionDetailScreen() {
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
           <Ionicons name="documents-outline" size={64} color={colors.textMuted} />
           <Text style={{ color: colors.textMuted, fontSize: 15, marginTop: 16, textAlign: 'center' }}>
-            {cards.length === 0 ? 'No cards yet.\nTap + to add your first card.' : 'No cards match your search.'}
+            {cards.length === 0 ? t.collectionDetail.noCardsYet : t.collectionDetail.noCardsMatch}
           </Text>
         </View>
       ) : (
@@ -312,10 +314,10 @@ export default function CollectionDetailScreen() {
                           fontSize: 10, fontWeight: '600',
                           color: new Date(card.next_review_date) <= new Date() ? '#F59E0B' : colors.textMuted,
                         }}>
-                          {new Date(card.next_review_date) <= new Date() ? 'DUE' : `${Math.ceil((new Date(card.next_review_date).getTime() - Date.now()) / 86400000)}d`}
+                          {new Date(card.next_review_date) <= new Date() ? t.collectionDetail.statusDue : `${Math.ceil((new Date(card.next_review_date).getTime() - Date.now()) / 86400000)}d`}
                         </Text>
                       ) : (
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: '#22C55E' }}>NEW</Text>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: '#22C55E' }}>{t.collectionDetail.statusNew}</Text>
                       )}
                     </View>
                   )}
@@ -361,14 +363,14 @@ export default function CollectionDetailScreen() {
       )}
 
       {/* ── Edit Collection Sheet ── */}
-      <Sheet visible={showEditSheet} title="Edit Collection" onClose={() => setShowEditSheet(false)} scrollable>
+      <Sheet visible={showEditSheet} title={t.collectionDetail.editCollection} onClose={() => setShowEditSheet(false)} scrollable>
         <ErrorBanner msg={error} />
-        <SheetInput label="Name" value={editName} onChangeText={setEditName} placeholder="Collection name" autoCapitalize="words" />
-        <SheetInput label="Description" value={editDesc} onChangeText={setEditDesc} placeholder="Short description" multiline autoCapitalize="sentences" />
+        <SheetInput label={t.collectionDetail.nameLabel} value={editName} onChangeText={setEditName} placeholder={t.collectionDetail.namePlaceholder} autoCapitalize="words" />
+        <SheetInput label={t.collectionDetail.descriptionLabel} value={editDesc} onChangeText={setEditDesc} placeholder={t.collectionDetail.descriptionPlaceholder} multiline autoCapitalize="sentences" />
 
         {/* Tags */}
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Tags</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.collectionDetail.tagsLabel}</Text>
           <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
             <View style={{
               flex: 1, flexDirection: 'row', alignItems: 'center',
@@ -377,7 +379,7 @@ export default function CollectionDetailScreen() {
             }}>
               <TextInput
                 style={{ flex: 1, color: colors.text, fontSize: 14 }}
-                placeholder="Add tag" placeholderTextColor={colors.textMuted}
+                placeholder={t.collectionDetail.addTagPlaceholder} placeholderTextColor={colors.textMuted}
                 value={editTagInput} onChangeText={setEditTagInput}
                 onSubmitEditing={addEditTag} returnKeyType="done"
               />
@@ -420,7 +422,7 @@ export default function CollectionDetailScreen() {
           }}
         >
           {saving ? <ActivityIndicator color="#fff" /> : (
-            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>Save Changes</Text>
+            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>{t.collectionDetail.saveChanges}</Text>
           )}
         </TouchableOpacity>
       </Sheet>

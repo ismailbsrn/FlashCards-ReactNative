@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
 import * as db from '@/services/database';
 import { performSync } from '@/services/sync';
 import type { Card } from '@/types/models';
@@ -23,6 +24,7 @@ export default function CardEditorScreen() {
   const { cardId, collectionId } = useLocalSearchParams<{ cardId?: string; collectionId: string }>();
   const { user } = useAuth();
   const { colors, isDark } = useTheme();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const isEditing = !!cardId;
@@ -46,7 +48,7 @@ export default function CardEditorScreen() {
 
   async function save() {
     if (!front.trim() || !back.trim()) {
-      Alert.alert('Error', 'Both front and back are required.');
+      Alert.alert(t.common.error, t.cardEditor.bothRequired);
       return;
     }
     setSaving(true);
@@ -70,7 +72,7 @@ export default function CardEditorScreen() {
       performSync().catch(() => {});
       router.back();
     } catch (e: any) {
-      Alert.alert('Error', e.message ?? 'Failed to save card');
+      Alert.alert(t.common.error, e.message ?? t.cardEditor.saveFailed);
     } finally {
       setSaving(false);
     }
@@ -95,7 +97,7 @@ export default function CardEditorScreen() {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={{ color: colors.text, fontSize: 20, fontWeight: '800', flex: 1 }}>
-          {isEditing ? 'Edit Card' : 'New Card'}
+          {isEditing ? t.cardEditor.editCard : t.cardEditor.newCard}
         </Text>
       </View>
 
@@ -112,14 +114,14 @@ export default function CardEditorScreen() {
       >
         {/* Front */}
         <View style={{ marginBottom: 20 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '600' }}>FRONT</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '600' }}>{t.cardEditor.front}</Text>
           <View style={{
             backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder,
             borderRadius: 16, padding: 16, minHeight: 140,
           }}>
             <TextInput
               style={{ color: colors.text, fontSize: 16, textAlignVertical: 'top' }}
-              placeholder="Enter the question or term..."
+              placeholder={t.cardEditor.frontPlaceholder}
               placeholderTextColor={colors.textMuted}
               value={front}
               onChangeText={setFront}
@@ -145,14 +147,14 @@ export default function CardEditorScreen() {
 
         {/* Back */}
         <View style={{ marginBottom: 24 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '600' }}>BACK</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, fontWeight: '600' }}>{t.cardEditor.back}</Text>
           <View style={{
             backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder,
             borderRadius: 16, padding: 16, minHeight: 140,
           }}>
             <TextInput
               style={{ color: colors.text, fontSize: 16, textAlignVertical: 'top' }}
-              placeholder="Enter the answer or definition..."
+              placeholder={t.cardEditor.backPlaceholder}
               placeholderTextColor={colors.textMuted}
               value={back}
               onChangeText={setBack}
@@ -179,7 +181,7 @@ export default function CardEditorScreen() {
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>
-              {isEditing ? 'Save Changes' : 'Create Card'}
+              {isEditing ? t.cardEditor.saveChanges : t.cardEditor.createCard}
             </Text>
           )}
         </TouchableOpacity>

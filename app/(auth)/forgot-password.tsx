@@ -2,6 +2,7 @@ import { authService } from '@/services/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,6 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ForgotPasswordScreen() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +24,7 @@ export default function ForgotPasswordScreen() {
 
   const handleSubmit = async () => {
     if (!email.trim()) {
-      setError('Please enter your email address');
+      setError(t.forgotPassword.enterEmail);
       return;
     }
 
@@ -33,7 +35,7 @@ export default function ForgotPasswordScreen() {
       await authService.forgotPassword(email.trim().toLowerCase());
       setSubmitted(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setError(err instanceof Error ? err.message : t.forgotPassword.somethingWentWrong);
     } finally {
       setIsLoading(false);
     }
@@ -58,16 +60,14 @@ export default function ForgotPasswordScreen() {
           </View>
 
           <Text style={{ color: '#FFFFFF', fontSize: 26, fontWeight: '700', textAlign: 'center', letterSpacing: -0.5 }}>
-            Check your inbox
+            {t.forgotPassword.checkInbox}
           </Text>
           <Text style={{ color: '#6B7280', fontSize: 15, textAlign: 'center', marginTop: 12, lineHeight: 22, maxWidth: 300 }}>
-            If an account exists for{' '}
-            <Text style={{ color: '#A78BFA', fontWeight: '500' }}>{email}</Text>
-            , you'll receive a password reset link shortly.
+            {t.forgotPassword.ifAccountExists(email)}
           </Text>
 
           <Text style={{ color: '#4B5563', fontSize: 13, textAlign: 'center', marginTop: 16, lineHeight: 20, maxWidth: 280 }}>
-            Didn't receive it? Check your spam folder or try again in a few minutes.
+            {t.forgotPassword.didntReceive}
           </Text>
 
           <TouchableOpacity
@@ -82,7 +82,7 @@ export default function ForgotPasswordScreen() {
               shadowOpacity: 0.35, shadowRadius: 16, elevation: 8,
             }}
           >
-            <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>Back to Sign In</Text>
+            <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>{t.forgotPassword.backToSignIn}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -91,7 +91,7 @@ export default function ForgotPasswordScreen() {
             style={{ marginTop: 20 }}
           >
             <Text style={{ color: '#6B7280', fontSize: 14 }}>
-              Try a different <Text style={{ color: '#8B5CF6', fontWeight: '500' }}>email</Text>
+              {t.forgotPassword.tryDifferent}<Text style={{ color: '#8B5CF6', fontWeight: '500' }}>{t.forgotPassword.emailLink}</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -137,10 +137,10 @@ export default function ForgotPasswordScreen() {
 
           {/* Heading */}
           <Text style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '700', letterSpacing: -0.5 }}>
-            Forgot password?
+            {t.forgotPassword.title}
           </Text>
           <Text style={{ color: '#6B7280', fontSize: 15, marginTop: 10, lineHeight: 22 }}>
-            No worries. Enter your email and we'll send you a reset link.
+            {t.forgotPassword.description}
           </Text>
 
           <View style={{ marginTop: 36 }}>
@@ -157,7 +157,7 @@ export default function ForgotPasswordScreen() {
             ) : null}
 
             {/* Email field */}
-            <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Email</Text>
+            <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.forgotPassword.email}</Text>
             <View style={{
               flexDirection: 'row', alignItems: 'center',
               backgroundColor: 'rgba(255,255,255,0.05)',
@@ -168,7 +168,7 @@ export default function ForgotPasswordScreen() {
               <Ionicons name="mail-outline" size={20} color="#6B7280" />
               <TextInput
                 style={{ flex: 1, color: '#FFFFFF', marginLeft: 12, fontSize: 15 }}
-                placeholder="your@email.com"
+                placeholder={t.forgotPassword.emailPlaceholder}
                 placeholderTextColor="#4B5563"
                 value={email}
                 onChangeText={setEmail}
@@ -196,7 +196,7 @@ export default function ForgotPasswordScreen() {
             >
               {isLoading
                 ? <ActivityIndicator color="#FFFFFF" />
-                : <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>Send Reset Link</Text>
+                : <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>{t.forgotPassword.sendResetLink}</Text>
               }
             </TouchableOpacity>
           </View>
@@ -209,7 +209,7 @@ export default function ForgotPasswordScreen() {
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
             >
               <Ionicons name="arrow-back-outline" size={16} color="#8B5CF6" />
-              <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '500' }}>Back to Sign In</Text>
+              <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '500' }}>{t.forgotPassword.backToSignIn}</Text>
             </TouchableOpacity>
           </View>
 

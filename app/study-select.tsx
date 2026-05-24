@@ -6,6 +6,7 @@ import type { Collection } from '@/types/models';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ActivityIndicator,
   ScrollView,
@@ -21,6 +22,7 @@ export default function StudySelectScreen() {
   const { collectionId } = useLocalSearchParams<{ collectionId?: string }>();
   const { user } = useAuth();
   const { colors, isDark } = useTheme();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -122,10 +124,10 @@ export default function StudySelectScreen() {
   }
 
   const filters: { key: FilterMode; label: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { key: 'due', label: 'Due', icon: 'time-outline' },
-    { key: 'new', label: 'New', icon: 'sparkles-outline' },
-    { key: 'learning', label: 'Learning', icon: 'trending-up-outline' },
-    { key: 'all', label: 'All', icon: 'layers-outline' },
+    { key: 'due', label: t.studySelect.filterDue, icon: 'time-outline' },
+    { key: 'new', label: t.studySelect.filterNew, icon: 'sparkles-outline' },
+    { key: 'learning', label: t.studySelect.filterLearning, icon: 'trending-up-outline' },
+    { key: 'all', label: t.studySelect.filterAll, icon: 'layers-outline' },
   ];
 
   return (
@@ -138,13 +140,13 @@ export default function StudySelectScreen() {
         <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800', flex: 1 }}>Study</Text>
+        <Text style={{ color: colors.text, fontSize: 22, fontWeight: '800', flex: 1 }}>{t.studySelect.title}</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
         {/* Filter chips */}
         <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-          <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 }}>Filter</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 }}>{t.studySelect.filter}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -4 }}>
             <View style={{ flexDirection: 'row', gap: 8, paddingHorizontal: 4 }}>
               {filters.map((f) => {
@@ -173,7 +175,7 @@ export default function StudySelectScreen() {
         {/* Tag chips */}
         {allTags.length > 0 && (
           <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-            <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 }}>Tags</Text>
+            <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 }}>{t.studySelect.tags}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
               {allTags.map((tag) => {
                 const isActive = selectedTags.has(tag);
@@ -198,7 +200,7 @@ export default function StudySelectScreen() {
 
         {/* Collection list */}
         <View style={{ paddingHorizontal: 16 }}>
-          <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 }}>Decks</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '600', letterSpacing: 0.8, textTransform: 'uppercase', marginBottom: 10 }}>{t.studySelect.decks}</Text>
           {filteredCollections.map((col) => {
             const isSelected = selectedIds.has(col.id);
             const count = getFilteredCount(col.id);
@@ -230,7 +232,7 @@ export default function StudySelectScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: colors.text, fontSize: 15, fontWeight: '600' }} numberOfLines={1}>{col.name}</Text>
                   <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 2 }}>
-                    {count} card{count !== 1 ? 's' : ''}
+                    {count} {count === 1 ? t.studySelect.card : t.studySelect.cards}
                   </Text>
                 </View>
                 {count > 0 && (
@@ -268,7 +270,7 @@ export default function StudySelectScreen() {
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <Ionicons name="play-circle" size={22} color="#fff" />
             <Text style={{ color: '#fff', fontSize: 17, fontWeight: '700' }}>
-              Start Study ({totalSelectedCount()})
+              {t.studySelect.startStudy(totalSelectedCount())}
             </Text>
           </View>
         </TouchableOpacity>

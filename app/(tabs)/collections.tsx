@@ -2,6 +2,7 @@ import ColorPicker from '@/components/ColorPicker';
 import Sheet, { ErrorBanner, SheetInput } from '@/components/Sheet';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
 import * as db from '@/services/database';
 import { exportCollections, importFromFile } from '@/services/importExport';
 import { performSync } from '@/services/sync';
@@ -24,6 +25,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function CollectionsScreen() {
   const { user } = useAuth();
   const { colors, isDark } = useTheme();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -99,7 +101,7 @@ export default function CollectionsScreen() {
   }
 
   async function saveCollection() {
-    if (!name.trim()) { setError('Name is required'); return; }
+    if (!name.trim()) { setError(t.collections.nameRequired); return; }
     if (!user) return;
     setSaving(true);
     setError('');
@@ -160,12 +162,12 @@ export default function CollectionsScreen() {
 
   async function bulkDelete() {
     Alert.alert(
-      'Delete Collections',
-      `Delete ${selectedIds.size} collection(s)? This cannot be undone.`,
+      t.collections.deleteCollections,
+      t.collections.deleteCollectionsMsg(selectedIds.size),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t.common.cancel, style: 'cancel' },
         {
-          text: 'Delete', style: 'destructive',
+          text: t.common.delete, style: 'destructive',
           onPress: async () => {
             for (const id of selectedIds) {
               await db.deleteCollection(id);
@@ -190,14 +192,14 @@ export default function CollectionsScreen() {
       const result = await importFromFile(user.id);
       await loadData();
       performSync().catch(() => {});
-      let msg = `Imported ${result.collectionsImported} collection(s) with ${result.cardsImported} card(s).`;
+      let msg = t.collections.importMsg(result.collectionsImported, result.cardsImported);
       if (result.errors.length > 0) {
-        msg += `\n\n${result.errors.length} warning(s):\n${result.errors.slice(0, 3).join('\n')}`;
+        msg += `\n\n${t.collections.importWarnings(result.errors.length)}\n${result.errors.slice(0, 3).join('\n')}`;
       }
-      Alert.alert('Import Complete', msg);
+      Alert.alert(t.collections.importComplete, msg);
     } catch (e: any) {
       if (e.message !== 'No file selected') {
-        Alert.alert('Import Failed', e.message);
+        Alert.alert(t.collections.importFailed, e.message);
       }
     }
   }
@@ -208,7 +210,7 @@ export default function CollectionsScreen() {
       setSelectionMode(false);
       setSelectedIds(new Set());
     } catch (e: any) {
-      Alert.alert('Export Failed', e.message);
+      Alert.alert(t.collections.exportFailed, e.message);
     }
   }
 
@@ -229,10 +231,10 @@ export default function CollectionsScreen() {
 
       {/* Header */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 12 }}>
-        <Text style={{ color: colors.text, fontSize: 24, fontWeight: '800' }}>Collections</Text>
+        <Text style={{ color: colors.text, fontSize: 24, fontWeight: '800' }}>{t.collections.title}</Text>
         {selectionMode ? (
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-            <Text style={{ color: colors.textMuted, fontSize: 13 }}>{selectedIds.size} selected</Text>
+            <Text style={{ color: colors.textMuted, fontSize: 13 }}>{selectedIds.size} {t.common.selected}</Text>
             <TouchableOpacity onPress={handleBulkExport}>
               <Ionicons name="share-outline" size={22} color={colors.accentLight} />
             </TouchableOpacity>
@@ -254,7 +256,7 @@ export default function CollectionsScreen() {
               }}
             >
               <Ionicons name="download-outline" size={18} color={colors.accentLight} />
-              <Text style={{ color: colors.accentLight, fontSize: 13, fontWeight: '700' }}>Import</Text>
+              <Text style={{ color: colors.accentLight, fontSize: 13, fontWeight: '700' }}>{t.common.import}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={openCreateSheet}
@@ -273,9 +275,9 @@ export default function CollectionsScreen() {
       {collections.length === 0 ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
           <Ionicons name="library-outline" size={80} color={colors.textMuted} />
-          <Text style={{ color: colors.text, fontSize: 20, fontWeight: '700', marginTop: 20 }}>No Collections Yet</Text>
+          <Text style={{ color: colors.text, fontSize: 20, fontWeight: '700', marginTop: 20 }}>{t.collections.noCollectionsTitle}</Text>
           <Text style={{ color: colors.textMuted, fontSize: 14, marginTop: 8, textAlign: 'center' }}>
-            Tap the + button to create your first flashcard collection.
+            {t.collections.noCollectionsDesc}
           </Text>
         </View>
       ) : (
@@ -348,14 +350,14 @@ export default function CollectionsScreen() {
       )}
 
       {/* ── Create / Edit Sheet ── */}
-      <Sheet visible={showSheet} title={editingCollection ? 'Edit Collection' : 'New Collection'} onClose={() => setShowSheet(false)} scrollable>
+      <Sheet visible={showSheet} title={editingCollection ? t.collections.editCollection : t.collections.newCollection} onClose={() => setShowSheet(false)} scrollable>
         <ErrorBanner msg={error} />
-        <SheetInput label="Name" value={name} onChangeText={setName} placeholder="Collection name" autoCapitalize="words" />
-        <SheetInput label="Description (optional)" value={description} onChangeText={setDescription} placeholder="Short description" multiline autoCapitalize="sentences" />
+        <SheetInput label={t.collections.nameLabel} value={name} onChangeText={setName} placeholder={t.collections.namePlaceholder} autoCapitalize="words" />
+        <SheetInput label={t.collections.descriptionLabel} value={description} onChangeText={setDescription} placeholder={t.collections.descriptionPlaceholder} multiline autoCapitalize="sentences" />
 
         {/* Tags */}
         <View style={{ marginBottom: 16 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Tags</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.collections.tagsLabel}</Text>
           <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
             <View style={{
               flex: 1, flexDirection: 'row', alignItems: 'center',
@@ -364,7 +366,7 @@ export default function CollectionsScreen() {
             }}>
               <TextInput
                 style={{ flex: 1, color: colors.text, fontSize: 14 }}
-                placeholder="Add tag"
+                placeholder={t.collections.addTagPlaceholder}
                 placeholderTextColor={colors.textMuted}
                 value={tagInput}
                 onChangeText={setTagInput}
@@ -418,7 +420,7 @@ export default function CollectionsScreen() {
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>
-              {editingCollection ? 'Save Changes' : 'Create Collection'}
+              {editingCollection ? t.collections.saveChanges : t.collections.createCollection}
             </Text>
           )}
         </TouchableOpacity>

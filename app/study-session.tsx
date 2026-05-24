@@ -7,6 +7,7 @@ import type { Card, ReviewQuality } from '@/types/models';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ActivityIndicator,
   Animated,
@@ -20,6 +21,7 @@ export default function StudySessionScreen() {
   const { collectionIds, filterMode } = useLocalSearchParams<{ collectionIds: string; filterMode?: string }>();
   const { user } = useAuth();
   const { colors, isDark } = useTheme();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [cards, setCards] = useState<Card[]>([]);
@@ -149,10 +151,10 @@ export default function StudySessionScreen() {
   });
 
   const ratingButtons: { quality: ReviewQuality; label: string; color: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { quality: 'wrong', label: 'Again', color: '#EF4444', icon: 'close-circle' },
-    { quality: 'hard', label: 'Hard', color: '#F59E0B', icon: 'alert-circle' },
-    { quality: 'good', label: 'Good', color: '#3B82F6', icon: 'checkmark-circle' },
-    { quality: 'easy', label: 'Easy', color: '#22C55E', icon: 'star' },
+    { quality: 'wrong', label: t.studySession.again, color: '#EF4444', icon: 'close-circle' },
+    { quality: 'hard', label: t.studySession.hard, color: '#F59E0B', icon: 'alert-circle' },
+    { quality: 'good', label: t.studySession.good, color: '#3B82F6', icon: 'checkmark-circle' },
+    { quality: 'easy', label: t.studySession.easy, color: '#22C55E', icon: 'star' },
   ];
 
   if (loading) {
@@ -170,13 +172,13 @@ export default function StudySessionScreen() {
           <TouchableOpacity onPress={() => router.back()} style={{ marginRight: 12 }}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={{ color: colors.text, fontSize: 20, fontWeight: '800' }}>Study</Text>
+          <Text style={{ color: colors.text, fontSize: 20, fontWeight: '800' }}>{t.studySession.study}</Text>
         </View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 40 }}>
           <Ionicons name="checkmark-done-circle" size={80} color="#22C55E" />
-          <Text style={{ color: colors.text, fontSize: 22, fontWeight: '700', marginTop: 16 }}>All caught up!</Text>
+          <Text style={{ color: colors.text, fontSize: 22, fontWeight: '700', marginTop: 16 }}>{t.studySession.allCaughtUp}</Text>
           <Text style={{ color: colors.textMuted, fontSize: 15, marginTop: 8, textAlign: 'center' }}>
-            No cards to study right now. Check back later!
+            {t.studySession.noCardsToStudy}
           </Text>
           <TouchableOpacity
             onPress={() => router.back()}
@@ -185,7 +187,7 @@ export default function StudySessionScreen() {
               marginTop: 28,
             }}
           >
-            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>Go Back</Text>
+            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>{t.common.goBack}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -208,9 +210,9 @@ export default function StudySessionScreen() {
           }}>
             <Ionicons name="trophy" size={48} color="#22C55E" />
           </View>
-          <Text style={{ color: colors.text, fontSize: 28, fontWeight: '800' }}>Great Job! 🎉</Text>
+          <Text style={{ color: colors.text, fontSize: 28, fontWeight: '800' }}>{t.studySession.greatJob}</Text>
           <Text style={{ color: colors.textMuted, fontSize: 15, marginTop: 8, textAlign: 'center' }}>
-            You completed this study session!
+            {t.studySession.sessionComplete}
           </Text>
 
           <View style={{
@@ -221,7 +223,7 @@ export default function StudySessionScreen() {
               borderRadius: 16, padding: 20, alignItems: 'center', flex: 1,
             }}>
               <Text style={{ color: colors.text, fontSize: 26, fontWeight: '800' }}>{reviewCount}</Text>
-              <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 4 }}>Cards Reviewed</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 4 }}>{t.studySession.cardsReviewed}</Text>
             </View>
             <View style={{
               backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.surfaceBorder,
@@ -230,7 +232,7 @@ export default function StudySessionScreen() {
               <Text style={{ color: colors.text, fontSize: 26, fontWeight: '800' }}>
                 {minutes > 0 ? `${minutes}m` : ''}{seconds}s
               </Text>
-              <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 4 }}>Time Spent</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 12, marginTop: 4 }}>{t.studySession.timeSpent}</Text>
             </View>
           </View>
 
@@ -244,7 +246,7 @@ export default function StudySessionScreen() {
               shadowOpacity: 0.3, shadowRadius: 14, elevation: 8,
             }}
           >
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>Done</Text>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>{t.common.done}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -307,7 +309,7 @@ export default function StudySessionScreen() {
                   backgroundColor: colors.accentSoft, borderRadius: 8,
                   paddingHorizontal: 10, paddingVertical: 4,
                 }}>
-                  <Text style={{ color: colors.accentLight, fontSize: 11, fontWeight: '700' }}>FRONT</Text>
+                  <Text style={{ color: colors.accentLight, fontSize: 11, fontWeight: '700' }}>{t.studySession.front}</Text>
                 </View>
                 <Text style={{ color: colors.text, fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 32 }}>
                   {card.front}
@@ -318,7 +320,7 @@ export default function StudySessionScreen() {
                     flexDirection: 'row', alignItems: 'center', gap: 6,
                   }}>
                     <Ionicons name="hand-left-outline" size={14} color={colors.textMuted} />
-                    <Text style={{ color: colors.textMuted, fontSize: 13 }}>Tap to reveal</Text>
+                    <Text style={{ color: colors.textMuted, fontSize: 13 }}>{t.studySession.tapToReveal}</Text>
                   </View>
                 )}
               </View>
@@ -346,7 +348,7 @@ export default function StudySessionScreen() {
                   backgroundColor: 'rgba(59,130,246,0.15)', borderRadius: 8,
                   paddingHorizontal: 10, paddingVertical: 4,
                 }}>
-                  <Text style={{ color: '#3B82F6', fontSize: 11, fontWeight: '700' }}>BACK</Text>
+                  <Text style={{ color: '#3B82F6', fontSize: 11, fontWeight: '700' }}>{t.studySession.back}</Text>
                 </View>
                 <Text style={{ color: colors.text, fontSize: 20, textAlign: 'center', lineHeight: 30 }}>
                   {card.back}

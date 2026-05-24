@@ -3,10 +3,12 @@ import React from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function TabsLayout() {
   const { token, isLoading, isEmailVerified } = useAuth();
   const { colors } = useTheme();
+  const { t } = useLanguage();
 
   if (!isLoading && (!token || !isEmailVerified)) {
     return <Redirect href="/(auth)/login" />;
@@ -28,7 +30,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t.tabs.home,
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
         }}
@@ -36,7 +38,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="collections"
         options={{
-          title: 'Collections',
+          title: t.tabs.collections,
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Ionicons name="library-outline" size={size} color={color} />,
         }}
@@ -44,7 +46,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: 'Profile',
+          title: t.tabs.profile,
           headerShown: false,
           tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}

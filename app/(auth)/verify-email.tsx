@@ -3,6 +3,7 @@ import { authService } from '@/services/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ActivityIndicator,
   Text,
@@ -13,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function VerifyEmailScreen() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -28,7 +30,7 @@ export default function VerifyEmailScreen() {
       await authService.resendVerification(user.email);
       setResendSuccess(true);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to resend. Please try again.');
+      setError(err instanceof Error ? err.message : t.verifyEmail.resendFailed);
     } finally {
       setIsResending(false);
     }
@@ -59,10 +61,10 @@ export default function VerifyEmailScreen() {
 
         {/* Heading */}
         <Text style={{ color: '#FFFFFF', fontSize: 28, fontWeight: '700', textAlign: 'center', letterSpacing: -0.5 }}>
-          Verify your email
+          {t.verifyEmail.title}
         </Text>
         <Text style={{ color: '#6B7280', fontSize: 15, textAlign: 'center', marginTop: 12, lineHeight: 22, maxWidth: 300 }}>
-          We sent a verification link to
+          {t.verifyEmail.sentTo}
         </Text>
         <View style={{
           backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -70,11 +72,11 @@ export default function VerifyEmailScreen() {
           marginTop: 8, marginBottom: 12,
         }}>
           <Text style={{ color: '#A78BFA', fontSize: 15, fontWeight: '600' }}>
-            {user?.email ?? 'your email address'}
+            {user?.email ?? t.verifyEmail.fallbackEmail}
           </Text>
         </View>
         <Text style={{ color: '#6B7280', fontSize: 14, textAlign: 'center', lineHeight: 20, maxWidth: 300 }}>
-          Click the link in the email to activate your account. Check your spam folder if you don't see it.
+          {t.verifyEmail.checkSpam}
         </Text>
 
         {/* Error / success messages */}
@@ -98,7 +100,7 @@ export default function VerifyEmailScreen() {
             flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
           }}>
             <Ionicons name="checkmark-circle" size={16} color="#4ADE80" />
-            <Text style={{ color: '#4ADE80', fontSize: 13 }}>Verification email sent!</Text>
+            <Text style={{ color: '#4ADE80', fontSize: 13 }}>{t.verifyEmail.verificationSent}</Text>
           </View>
         ) : null}
 
@@ -116,7 +118,7 @@ export default function VerifyEmailScreen() {
             }}
           >
             <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>
-              I've verified my email
+              {t.verifyEmail.iVerified}
             </Text>
           </TouchableOpacity>
 
@@ -138,7 +140,7 @@ export default function VerifyEmailScreen() {
             ) : (
               <>
                 <Ionicons name="refresh-outline" size={18} color="#9CA3AF" />
-                <Text style={{ color: '#9CA3AF', fontSize: 15, fontWeight: '500' }}>Resend email</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 15, fontWeight: '500' }}>{t.verifyEmail.resendEmail}</Text>
               </>
             )}
           </TouchableOpacity>
@@ -151,7 +153,7 @@ export default function VerifyEmailScreen() {
           style={{ marginTop: 24 }}
         >
           <Text style={{ color: '#6B7280', fontSize: 14 }}>
-            Back to <Text style={{ color: '#8B5CF6', fontWeight: '500' }}>login</Text>
+            {t.verifyEmail.backTo}<Text style={{ color: '#8B5CF6', fontWeight: '500' }}>{t.verifyEmail.login}</Text>
           </Text>
         </TouchableOpacity>
 

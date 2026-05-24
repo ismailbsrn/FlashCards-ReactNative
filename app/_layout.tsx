@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import './globals.css';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ThemeProvider, useTheme } from '@/context/ThemeContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 
 function RootLayoutNav() {
   const { token, isLoading, isEmailVerified } = useAuth();
@@ -22,10 +23,14 @@ function RootLayoutNav() {
     return (
       <>
         <StatusBar style="light" />
+        <Redirect href="/(auth)/login" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
-          <Redirect href="/(auth)/login" />
+          <Stack.Screen name="collection/[id]" />
+          <Stack.Screen name="card-editor" />
+          <Stack.Screen name="study-select" />
+          <Stack.Screen name="study-session" />
         </Stack>
       </>
     );
@@ -35,10 +40,14 @@ function RootLayoutNav() {
     return (
       <>
         <StatusBar style="light" />
+        <Redirect href="/(auth)/verify-email" />
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
-          <Redirect href="/(auth)/verify-email" />
+          <Stack.Screen name="collection/[id]" />
+          <Stack.Screen name="card-editor" />
+          <Stack.Screen name="study-select" />
+          <Stack.Screen name="study-session" />
         </Stack>
       </>
     );
@@ -50,6 +59,10 @@ function RootLayoutNav() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="(auth)" />
+        <Stack.Screen name="collection/[id]" />
+        <Stack.Screen name="card-editor" />
+        <Stack.Screen name="study-select" />
+        <Stack.Screen name="study-session" />
       </Stack>
     </>
   );
@@ -57,10 +70,12 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <RootLayoutNav />
-      </AuthProvider>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <RootLayoutNav />
+        </AuthProvider>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }

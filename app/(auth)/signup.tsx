@@ -2,6 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -16,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SignupScreen() {
   const { register } = useAuth();
+  const { t } = useLanguage();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,15 +29,15 @@ export default function SignupScreen() {
 
   const handleSignup = async () => {
     if (!email.trim() || !password || !confirmPassword) {
-      setError('Please fill in all required fields');
+      setError(t.signup.fillRequired);
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 8 characters');
+      setError(t.signup.passwordTooShort);
       return;
     }
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t.signup.passwordsDontMatch);
       return;
     }
 
@@ -54,7 +56,7 @@ export default function SignupScreen() {
         router.replace('/(tabs)');
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
+      setError(err instanceof Error ? err.message : t.signup.registrationFailed);
     } finally {
       setIsLoading(false);
     }
@@ -100,10 +102,10 @@ export default function SignupScreen() {
             {/* Heading */}
             <View style={{ marginBottom: 32 }}>
               <Text style={{ color: '#FFFFFF', fontSize: 30, fontWeight: '700', letterSpacing: -0.5 }}>
-                Create account
+                {t.signup.createAccount}
               </Text>
               <Text style={{ color: '#6B7280', fontSize: 15, marginTop: 8 }}>
-                Start your learning journey today
+                {t.signup.startJourney}
               </Text>
             </View>
 
@@ -122,14 +124,14 @@ export default function SignupScreen() {
             {/* Display Name */}
             <View style={{ marginBottom: 16 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8, marginLeft: 2 }}>
-                <Text style={{ color: '#9CA3AF', fontSize: 13 }}>Display Name</Text>
-                <Text style={{ color: '#4B5563', fontSize: 11, marginLeft: 6 }}>(optional)</Text>
+                <Text style={{ color: '#9CA3AF', fontSize: 13 }}>{t.signup.displayName}</Text>
+                <Text style={{ color: '#4B5563', fontSize: 11, marginLeft: 6 }}>{t.signup.optional}</Text>
               </View>
               <View style={inputContainerStyle}>
                 <Ionicons name="person-outline" size={20} color="#6B7280" />
                 <TextInput
                   style={inputStyle}
-                  placeholder="John Doe"
+                  placeholder={t.signup.displayNamePlaceholder}
                   placeholderTextColor="#4B5563"
                   value={displayName}
                   onChangeText={setDisplayName}
@@ -142,12 +144,12 @@ export default function SignupScreen() {
 
             {/* Email */}
             <View style={{ marginBottom: 16 }}>
-              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Email</Text>
+              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.signup.email}</Text>
               <View style={inputContainerStyle}>
                 <Ionicons name="mail-outline" size={20} color="#6B7280" />
                 <TextInput
                   style={inputStyle}
-                  placeholder="your@email.com"
+                  placeholder={t.signup.emailPlaceholder}
                   placeholderTextColor="#4B5563"
                   value={email}
                   onChangeText={setEmail}
@@ -161,12 +163,12 @@ export default function SignupScreen() {
 
             {/* Password */}
             <View style={{ marginBottom: 16 }}>
-              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Password</Text>
+              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.signup.password}</Text>
               <View style={inputContainerStyle}>
                 <Ionicons name="lock-closed-outline" size={20} color="#6B7280" />
                 <TextInput
                   style={inputStyle}
-                  placeholder="Min. 8 characters"
+                  placeholder={t.signup.passwordPlaceholder}
                   placeholderTextColor="#4B5563"
                   value={password}
                   onChangeText={setPassword}
@@ -181,19 +183,19 @@ export default function SignupScreen() {
               </View>
               {password.length > 0 && password.length < 6 && (
                 <Text style={{ color: '#F87171', fontSize: 12, marginTop: 6, marginLeft: 2 }}>
-                  Password is too short
+                  {t.signup.passwordIsTooShort}
                 </Text>
               )}
             </View>
 
             {/* Confirm Password */}
             <View style={{ marginBottom: 8 }}>
-              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>Confirm Password</Text>
+              <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8, marginLeft: 2 }}>{t.signup.confirmPassword}</Text>
               <View style={inputContainerStyle}>
                 <Ionicons name="lock-closed-outline" size={20} color="#6B7280" />
                 <TextInput
                   style={inputStyle}
-                  placeholder="Re-enter password"
+                  placeholder={t.signup.confirmPasswordPlaceholder}
                   placeholderTextColor="#4B5563"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
@@ -226,15 +228,15 @@ export default function SignupScreen() {
             >
               {isLoading
                 ? <ActivityIndicator color="#FFFFFF" />
-                : <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>Create Account</Text>
+                : <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '600' }}>{t.signup.createAccountBtn}</Text>
               }
             </TouchableOpacity>
 
             {/* Sign in link */}
             <View style={{ flexDirection: 'row', justifyContent: 'center', marginTop: 28 }}>
-              <Text style={{ color: '#6B7280', fontSize: 14 }}>Already have an account? </Text>
+              <Text style={{ color: '#6B7280', fontSize: 14 }}>{t.signup.alreadyHaveAccount}</Text>
               <TouchableOpacity onPress={() => router.replace('/(auth)/login')} hitSlop={8}>
-                <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '600' }}>Sign in</Text>
+                <Text style={{ color: '#8B5CF6', fontSize: 14, fontWeight: '600' }}>{t.signup.signIn}</Text>
               </TouchableOpacity>
             </View>
 
