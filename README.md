@@ -77,3 +77,12 @@ oluşturuldu.
 
 
 **Video:** [22290137-İsmail-Başaran-IOS2-Dersi-17052026-V8](https://drive.google.com/file/d/1k440TGQCrpT-K6roFozB7bIxFBK7oRPF/view?usp=share_link)
+
+---
+
+### Dokuzuncu Hafta
+- Yerelleştirme özelliği eklendi.
+- Anasayfaya çalışma geçmişini gösteren ısı haritası eklendi.
+
+
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-24052026-V9](https://drive.google.com/file/d/1cixHu9X95tTkeicuEjwIhhL7y0G6FxvR/view?usp=share_link)
