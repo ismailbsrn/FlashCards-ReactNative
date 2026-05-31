@@ -92,4 +92,4 @@ oluşturuldu.
 ### Onuncu Hafta
 - Uygulama ikonu güncellendi.
 
-**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-31052026-V10]()
+**Video:** [22290137-İsmail-Başaran-IOS2-Dersi-31052026-V10](https://drive.google.com/file/d/1sSmUBQi1oHEJAydmSKhAugGEl44bltzY/view?usp=share_link)
